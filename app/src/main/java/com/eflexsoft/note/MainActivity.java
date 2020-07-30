@@ -11,15 +11,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.startapp.sdk.ads.banner.Banner;
+import com.startapp.sdk.adsbase.StartAppAd;
+import com.startapp.sdk.adsbase.StartAppSDK;
 
 import java.util.List;
+
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        FrameLayout container = findViewById(R.id.fragment_main);
+
         recyclerView = findViewById(R.id.recycleView);
         toolbar = findViewById(R.id.toolbar);
         recyclerView.setHasFixedSize(true);
@@ -45,6 +54,13 @@ public class MainActivity extends AppCompatActivity {
         viewModel = ViewModelProviders.of(this).get(NoteViewModel.class);
 
         setSupportActionBar(toolbar);
+
+        if (container != null && container.getChildCount() < 1) {
+            container.addView(new Banner(this), new FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER));
+            StartAppAd.showAd(this);
+        }
+        StartAppSDK.init(this, "206233878", true);
+        StartAppAd.showAd(this);
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
             @Override
@@ -89,6 +105,12 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        StartAppAd.showAd(this);
     }
 
     public void openAdd(View view) {

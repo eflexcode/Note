@@ -14,13 +14,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.startapp.sdk.ads.banner.Banner;
+import com.startapp.sdk.adsbase.StartAppAd;
+import com.startapp.sdk.adsbase.StartAppSDK;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -28,6 +34,8 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 public class AddEditNoteActivity extends AppCompatActivity {
     TextView subject;
@@ -41,14 +49,17 @@ public class AddEditNoteActivity extends AppCompatActivity {
     String date;
     int id;
     Toolbar toolbar;
+    TextView textTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_edit_note);
 
+        FrameLayout container = findViewById(R.id.fragment_main);
         subject = findViewById(R.id.edit_subject);
         body = findViewById(R.id.edit_body);
+        textTitle = findViewById(R.id.textTitle);
         priority = findViewById(R.id.priority_pick);
         toolbar = findViewById(R.id.toolbar);
         priority.setMaxValue(100);
@@ -67,6 +78,19 @@ public class AddEditNoteActivity extends AppCompatActivity {
             body.setText(updateBody);
             priority.setValue(updatePriority);
         }
+
+        if (updateSubject == null){
+            textTitle.setText("Add Note");
+        }else {
+            textTitle.setText("Update Note");
+        }
+
+        if (container != null && container.getChildCount() < 1) {
+            container.addView(new Banner(this), new FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER));
+            StartAppAd.showAd(this);
+        }
+        StartAppSDK.init(this, "206233878", true);
+        StartAppAd.showAd(this);
 
     }
 

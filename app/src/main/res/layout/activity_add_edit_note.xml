@@ -26,7 +26,8 @@
             android:layout_below="@id/edit_body"
             android:fontFamily="casual"
             android:padding="10dp"
-            android:text="update note"
+            android:id="@+id/textTitle"
+            android:text=""
             android:textColor="#FFFFFE"
             android:textSize="20dp"
             android:textStyle="bold" />
@@ -104,5 +105,13 @@
 
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <FrameLayout
+        android:id="@+id/fragment_main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="5dp"
+        />
 
 </RelativeLayout>
