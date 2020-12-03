@@ -85,19 +85,19 @@ public class AddEditNoteActivity extends AppCompatActivity {
             textTitle.setText("Update Note");
         }
 
-        if (container != null && container.getChildCount() < 1) {
-            container.addView(new Banner(this), new FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER));
-            StartAppAd.showAd(this);
-        }
-        StartAppSDK.init(this, "206233878", true);
-        StartAppAd.showAd(this);
+//        if (container != null && container.getChildCount() < 1) {
+//            container.addView(new Banner(this), new FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER));
+//            StartAppAd.showAd(this);
+//        }
+//        StartAppSDK.init(this, "206233878", true);
+//        StartAppAd.showAd(this);
 
     }
 
     public void saveUpdate(View view) {
         Calendar calendar = Calendar.getInstance();
 
-        String getDate = DateFormat.getDateInstance(DateFormat.SHORT).format(calendar.getTime());
+        String getDate = DateFormat.getDateInstance(DateFormat.MEDIUM).format(calendar.getTime());
 
         String getSubject = subject.getText().toString();
         String getBody = body.getText().toString();

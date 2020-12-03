@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.2"
+    buildToolsVersion "29.0.1"
 
     defaultConfig {
         applicationId "com.eflexsoft.note"
@@ -12,6 +12,10 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    dataBinding {
+        enabled = true
     }
 
     buildTypes {
@@ -25,6 +29,7 @@ android {
 
 dependencies {
 
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
     def lifecycle_version = "2.2.0"
     def room_version = "2.2.1"
     def cardview_version = "1.0.0"
@@ -32,14 +37,14 @@ dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    testImplementation 'junit:junit:4.13.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     implementation "androidx.cardview:cardview:$cardview_version"
-    implementation "com.google.android.material:material:1.0.0-alpha1"
+    implementation 'com.google.android.material:material:1.2.1'
 
 //     implementation'com.andriod.support:design:27.1.1'
 
