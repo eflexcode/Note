@@ -1,6 +1,7 @@
 package com.eflexsoft.note;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -15,6 +16,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.eflexsoft.note.databinding.ActivityNoteDetailBinding;
+import com.eflexsoft.note.model.Note;
+import com.eflexsoft.note.viewmodel.NoteViewModel;
 
 public class NoteDetailActivity extends AppCompatActivity {
 
@@ -27,13 +30,14 @@ public class NoteDetailActivity extends AppCompatActivity {
     int id;
     Note note;
     NoteViewModel noteViewModel;
+    ActivityNoteDetailBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_note_detail);
 
-        ActivityNoteDetailBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_note_detail);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_note_detail);
 
         setSupportActionBar(binding.toolbar);
         setTitle("");
@@ -54,8 +58,9 @@ public class NoteDetailActivity extends AppCompatActivity {
         updatePriority = intent.getIntExtra("priority", 0);
         date = intent.getStringExtra("date");
         id = intent.getIntExtra("id", -1);
-
+//        Toast.makeText(this, String.valueOf(id), Toast.LENGTH_SHORT).show();
         note = new Note(updateSubject, updateBody, date, updatePriority);
+//        note.setId(id);
         binding.setNote(note);
 
     }
@@ -103,10 +108,33 @@ public class NoteDetailActivity extends AppCompatActivity {
                 intent.putExtra("body", note.getBody());
                 intent.putExtra("date", note.getDate());
                 intent.putExtra("priority", note.getPriority());
-                intent.putExtra("id", note.getId());
-                startActivity(intent);
+                intent.putExtra("id", id);
+                startActivityForResult(intent, 3);
                 break;
         }
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 3 && resultCode == RESULT_OK) {
+
+            String subject = data.getStringExtra("subject");
+            String body = data.getStringExtra("body");
+            int priority = data.getIntExtra("priority", 0);
+            String date = data.getStringExtra("date");
+            int id = data.getIntExtra("id", -1);
+
+//            Toast.makeText(this, subject, Toast.LENGTH_SHORT).show();
+
+            note = new Note(subject, body, date, priority);
+            note.setId(id);
+
+
+
+            binding.setNote(note);
+//            binding.body.setText();
+        }
     }
 }

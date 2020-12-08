@@ -6,7 +6,7 @@
 
         <variable
             name="note"
-            type="com.eflexsoft.note.Note" />
+            type="com.eflexsoft.note.model.Note" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -52,6 +52,7 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="15dp"
                     android:paddingTop="5dp"
+                    android:textIsSelectable="true"
                     android:paddingEnd="15dp"
                     android:text="@{note.subject}"
                     android:textColor="#FFFFFF"
@@ -66,6 +67,7 @@
                     android:layout_marginStart="15dp"
                     android:gravity="start"
                     android:paddingTop="10dp"
+                    android:textIsSelectable="true"
                     android:singleLine="true"
                     android:text="@{note.date}"
                     android:textColor="#BFBBBB"
@@ -80,6 +82,7 @@
                     android:paddingStart="15dp"
                     android:paddingTop="5dp"
                     android:paddingEnd="15dp"
+                    android:textIsSelectable="true"
                     android:text="@{note.body}"
                     android:textColor="#DAD8D8"
                     android:textSize="18dp" />

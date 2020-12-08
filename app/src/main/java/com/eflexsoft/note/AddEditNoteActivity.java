@@ -1,11 +1,10 @@
 package com.eflexsoft.note;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.content.Intent;
@@ -14,33 +13,26 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.NumberPicker;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.startapp.sdk.ads.banner.Banner;
-import com.startapp.sdk.adsbase.StartAppAd;
-import com.startapp.sdk.adsbase.StartAppSDK;
+import com.eflexsoft.note.databinding.ActivityAddEditNoteBinding;
+import com.eflexsoft.note.model.Note;
+import com.eflexsoft.note.viewmodel.NoteViewModel;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.Date;
-
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 public class AddEditNoteActivity extends AppCompatActivity {
-    TextView subject;
-    TextView body;
-    NumberPicker priority;
+//    TextView subject;
+//    TextView body;
+//    NumberPicker priority;
 
     Intent intent;
     String updateSubject;
@@ -48,24 +40,27 @@ public class AddEditNoteActivity extends AppCompatActivity {
     int updatePriority;
     String date;
     int id;
-    Toolbar toolbar;
-    TextView textTitle;
+    //    Toolbar toolbar;
+//    TextView textTitle;
+    ActivityAddEditNoteBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_edit_note);
+//        setContentView(R.layout.activity_add_edit_note);
 
-        FrameLayout container = findViewById(R.id.fragment_main);
-        subject = findViewById(R.id.edit_subject);
-        body = findViewById(R.id.edit_body);
-        textTitle = findViewById(R.id.textTitle);
-        priority = findViewById(R.id.priority_pick);
-        toolbar = findViewById(R.id.toolbar);
-        priority.setMaxValue(100);
-        priority.setMinValue(0);
-        setSupportActionBar(toolbar);
-        setTitle("");
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_add_edit_note);
+
+//        FrameLayout container = findViewById(R.id.fragment_main);
+//        subject = findViewById(R.id.edit_subject);
+//        body = findViewById(R.id.edit_body);
+//        textTitle = findViewById(R.id.textTitle);
+//        priority = findViewById(R.id.priority_pick);
+//        toolbar = findViewById(R.id.toolbar);
+        binding.priorityPick.setMaxValue(100);
+        binding.priorityPick.setMinValue(0);
+//        priority.set(R.color.colorPrimary);
+        setSupportActionBar(binding.toolbar);
         intent = getIntent();
         updateSubject = intent.getStringExtra("subject");
         updateBody = intent.getStringExtra("body");
@@ -73,17 +68,26 @@ public class AddEditNoteActivity extends AppCompatActivity {
 //        date = intent.getStringExtra("date");
         id = intent.getIntExtra("id", -1);
 
+//        Toast.makeText(this, String.valueOf(id), Toast.LENGTH_SHORT).show();
+
         if (updateSubject != null) {
-            subject.setText(updateSubject);
-            body.setText(updateBody);
-            priority.setValue(updatePriority);
+            binding.editSubject.setText(updateSubject);
+            binding.editBody.setText(updateBody);
+            binding.priorityPick.setValue(updatePriority);
         }
 
-        if (updateSubject == null){
-            textTitle.setText("Add Note");
-        }else {
-            textTitle.setText("Update Note");
+        if (updateSubject == null) {
+            setTitle("Add Note");
+        } else {
+            setTitle("Update Note");
         }
+        binding.toolbar.setNavigationIcon(R.drawable.ic_left_arrow);
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
 
 //        if (container != null && container.getChildCount() < 1) {
 //            container.addView(new Banner(this), new FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER));
@@ -99,14 +103,14 @@ public class AddEditNoteActivity extends AppCompatActivity {
 
         String getDate = DateFormat.getDateInstance(DateFormat.MEDIUM).format(calendar.getTime());
 
-        String getSubject = subject.getText().toString();
-        String getBody = body.getText().toString();
-        int getPriority = priority.getValue();
+        String getSubject = binding.editSubject.getText().toString();
+        String getBody = binding.editBody.getText().toString();
+        int getPriority = binding.priorityPick.getValue();
 
-        NoteViewModel viewModel = ViewModelProviders.of(this).get(NoteViewModel.class);
+        NoteViewModel viewModel = new ViewModelProvider(this).get(NoteViewModel.class);
 
         if (getBody.isEmpty() || getSubject.isEmpty()) {
-            Toast.makeText(this, "a filed is empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "A filed is empty", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -116,10 +120,17 @@ public class AddEditNoteActivity extends AppCompatActivity {
         } else {
             Note note = new Note(getSubject, getBody, getDate, getPriority);
             note.setId(id);
-
             viewModel.update(note);
+            Intent intent = new Intent();
+            intent.putExtra("subject", getSubject);
+            intent.putExtra("body", getBody);
+            intent.putExtra("date", getDate);
+            intent.putExtra("priority",getPriority);
+            intent.putExtra("id", id);
+            setResult(RESULT_OK,intent);
             finish();
         }
+
 
     }
 
@@ -139,16 +150,16 @@ public class AddEditNoteActivity extends AppCompatActivity {
             case R.id.saveAsFile:
 
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                     }
                 } else {
 
                     Toast.makeText(this, "saving", Toast.LENGTH_SHORT).show();
                     try {
-                        String getSubject = subject.getText().toString();
-                        String getBody = body.getText().toString();
-                        int getPriority = priority.getValue();
+                        String getSubject = binding.editSubject.getText().toString();
+                        String getBody = binding.editBody.getText().toString();
+                        int getPriority = binding.priorityPick.getValue();
                         if (getBody.isEmpty() || getSubject.isEmpty()) {
                             Toast.makeText(this, "a file is empty", Toast.LENGTH_SHORT).show();
                         } else {
@@ -164,7 +175,7 @@ public class AddEditNoteActivity extends AppCompatActivity {
                             fileWriter.append(getBody + "/n priority " + getPriority);
                             fileWriter.flush();
                             fileWriter.close();
-                            Toast.makeText(this, "file saved successfully", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, "File saved successfully", Toast.LENGTH_SHORT).show();
 
                         }
                     } catch (IOException e) {
@@ -182,7 +193,7 @@ public class AddEditNoteActivity extends AppCompatActivity {
 
     private static final String TAG = "AddEditNoteActivity";
 
-    public void finish(View view) {
-        finish();
-    }
+//    public void finish(View view) {
+//        finish();
+//    }
 }

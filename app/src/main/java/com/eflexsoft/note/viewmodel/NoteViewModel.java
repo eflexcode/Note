@@ -1,4 +1,4 @@
-package com.eflexsoft.note;
+package com.eflexsoft.note.viewmodel;
 
 import android.app.Application;
 
@@ -6,12 +6,15 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import com.eflexsoft.note.model.Note;
+import com.eflexsoft.note.repository.Repository;
+
 import java.util.List;
 
 public class NoteViewModel extends AndroidViewModel {
 
     Repository repository;
-    LiveData<List<Note>> listLiveData;
+   public LiveData<List<Note>> listLiveData;
 
     public NoteViewModel(@NonNull Application application) {
         super(application);

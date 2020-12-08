@@ -1,2 +1,3 @@
+include ':nativeads'
 rootProject.name='Note'
 include ':app'

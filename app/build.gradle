@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.1"
+    buildToolsVersion "29.0.3"
 
     defaultConfig {
         applicationId "com.eflexsoft.note"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -34,19 +34,20 @@ dependencies {
     def room_version = "2.2.1"
     def cardview_version = "1.0.0"
 
-
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    
+    implementation 'com.google.android.gms:play-services-ads:19.6.0'
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     implementation "androidx.cardview:cardview:$cardview_version"
     implementation 'com.google.android.material:material:1.2.1'
-
-//     implementation'com.andriod.support:design:27.1.1'
+    implementation 'com.rengwuxian.materialedittext:library:2.1.4'
 
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     annotationProcessor "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
@@ -62,5 +63,5 @@ dependencies {
 
 // Rx Binding Library
     implementation "com.jakewharton.rxbinding3:rxbinding:$rxbinding_version"
-
+    implementation project(':nativeads')
 }

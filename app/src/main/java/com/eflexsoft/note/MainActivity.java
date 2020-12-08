@@ -2,77 +2,70 @@ package com.eflexsoft.note;
 
 import androidx.annotation.NonNull;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.TextView;
+import android.widget.Toast;
 
 
+import com.eflexsoft.note.adapter.NoteAdapter;
 import com.eflexsoft.note.databinding.ActivityMainBinding;
+import com.eflexsoft.note.model.Note;
+import com.eflexsoft.note.viewmodel.NoteViewModel;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdLoader;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.formats.NativeAdOptions;
+import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
-import com.startapp.sdk.ads.banner.Banner;
-import com.startapp.sdk.adsbase.StartAppAd;
-import com.startapp.sdk.adsbase.StartAppSDK;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
     NoteViewModel viewModel;
-//    RecyclerView recyclerView;
     NoteAdapter noteAdapter;
-//    TextView c;
 
-//    Toolbar toolbar;
-    CollapsingToolbarLayout collapsingToolbarLayout;
+    List<Object> objectList = new ArrayList<>();
+    AdLoader adLoader;
+    boolean isFistTime = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_main);
 
-        final ActivityMainBinding binding= DataBindingUtil.setContentView(this,R.layout.activity_main);
+        final ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        FrameLayout container = findViewById(R.id.fragment_main);
-
-//        recyclerView = findViewById(R.id.recycleView);
-//        toolbar = findViewById(R.id.toolbar);
         binding.recycleView.setHasFixedSize(true);
 
-        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2,RecyclerView.VERTICAL);
+        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, RecyclerView.VERTICAL);
 
         binding.recycleView.setLayoutManager(layoutManager);
+        binding.recycleView.setHasFixedSize(true);
         noteAdapter = new NoteAdapter(this);
         binding.recycleView.setAdapter(noteAdapter);
 //        c = findViewById(R.id.c);
-        viewModel = ViewModelProviders.of(this).get(NoteViewModel.class);
+        viewModel = new ViewModelProvider(this).get(NoteViewModel.class);
 
         setSupportActionBar(binding.toolbar);
-
-//        if (container != null && container.getChildCount() < 1) {
-//            container.addView(new Banner(this), new FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER));
-//            StartAppAd.showAd(this);
-//        }
-//        StartAppSDK.init(this, "206233878", true);
-//        StartAppAd.showAd(this);
-
 //        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
 //            @Override
 //            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
@@ -85,10 +78,49 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        }).attachToRecyclerView(binding.recycleView);
 
+        adLoader = new AdLoader.Builder(this, "ca-app-pub-9552597639357298/7138206538")
+                .forUnifiedNativeAd(new UnifiedNativeAd.OnUnifiedNativeAdLoadedListener() {
+                    @Override
+                    public void onUnifiedNativeAdLoaded(UnifiedNativeAd unifiedNativeAd) {
+
+//                        if (isDestroyed()) {
+//                            unifiedNativeAd.destroy();
+//                        } else {
+                        objectList.add(unifiedNativeAd);
+
+                        if (!adLoader.isLoading()) {
+                            noteAdapter.submitList(objectList);
+                            noteAdapter.notifyItemInserted(objectList.size() - 1);
+                        }
+//                        }
+                    }
+                }).withAdListener(new AdListener() {
+                    @Override
+                    public void onAdFailedToLoad(LoadAdError loadAdError) {
+                        super.onAdFailedToLoad(loadAdError);
+                        noteAdapter.submitList(objectList);
+                    }
+                }).withNativeAdOptions(new NativeAdOptions.Builder().build()).build();
+
+        adLoader.loadAds(new AdRequest.Builder().build(), 4);
+
         viewModel.listLiveData.observe(this, new Observer<List<Note>>() {
             @Override
             public void onChanged(List<Note> notes) {
-                noteAdapter.submitList(notes);
+
+                if (isFistTime) {
+                    objectList.addAll(notes);
+                    noteAdapter.submitList(objectList);
+                    isFistTime = false;
+                } else {
+
+                    objectList.clear();
+                    objectList.addAll(notes);
+                    adLoader.loadAds(new AdRequest.Builder().build(), 4);
+
+                    noteAdapter.submitList(objectList);
+                }
+
                 if (notes.isEmpty()) {
                     binding.c.setVisibility(View.VISIBLE);
                 } else {
@@ -110,7 +142,25 @@ public class MainActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case R.id.delete_All:
-                viewModel.deleteAll();
+
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this)
+                        .setTitle("Confirm Delete")
+                        .setMessage("are you sure want to delete all items from your Notes? for this cannot be undone")
+                        .setPositiveButton("Nope", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).setNegativeButton("Yap", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                viewModel.deleteAll();
+                            }
+                        });
+
+                AlertDialog dialog = alertDialog.create();
+
+                dialog.show();
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -121,7 +171,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-//        StartAppAd.showAd(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        adLoader.loadAds(new AdRequest.Builder().build(), 4);
     }
 
     public void openAdd(View view) {
