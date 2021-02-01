@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,27 +25,30 @@ import com.eflexsoft.note.R;
 import com.eflexsoft.note.databinding.NoteItem2Binding;
 import com.eflexsoft.note.viewholder.AdsViewHolder;
 import com.eflexsoft.note.viewholder.NoteViewHolder;
+import com.eflexsoft.note.viewmodel.ShowAds;
 import com.google.android.gms.ads.formats.UnifiedNativeAd;
 
-public class NoteAdapter extends ListAdapter<Object, RecyclerView.ViewHolder> {
+public class NoteAdapter extends ListAdapter<Note, NoteViewHolder> {
 
     Context context;
     public static final int TYPE_ADS = 0;
     public static final int TYPE_NORMAL = 1;
+
+    int clickCount = 0;
 
     public NoteAdapter(Context context) {
         super(itemCallback);
         this.context = context;
     }
 
-    static DiffUtil.ItemCallback<Object> itemCallback = new DiffUtil.ItemCallback<Object>() {
+    static DiffUtil.ItemCallback<Note> itemCallback = new DiffUtil.ItemCallback<Note>() {
         @Override
-        public boolean areItemsTheSame(@NonNull Object oldItem, @NonNull Object newItem) {
+        public boolean areItemsTheSame(@NonNull Note oldItem, @NonNull Note newItem) {
             return oldItem.getClass().equals(newItem.getClass());
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull Object oldItem, @NonNull Object newItem) {
+        public boolean areContentsTheSame(@NonNull Note oldItem, @NonNull Note newItem) {
             return oldItem.equals(newItem);
         }
     };
@@ -67,13 +72,13 @@ public class NoteAdapter extends ListAdapter<Object, RecyclerView.ViewHolder> {
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
 
-        if (TYPE_ADS == i) {
-            AdTemplateBinding binding = DataBindingUtil.inflate(inflater, R.layout.ad_template, viewGroup, false);
-            return new AdsViewHolder(binding);
-        }
+//        if (TYPE_ADS == i) {
+//            AdTemplateBinding binding = DataBindingUtil.inflate(inflater, R.layout.ad_template, viewGroup, false);
+//            return new AdsViewHolder(binding);
+//        }
 
         NoteItem2Binding binding = DataBindingUtil.inflate(inflater, R.layout.note_item2, viewGroup, false);
 
@@ -81,47 +86,60 @@ public class NoteAdapter extends ListAdapter<Object, RecyclerView.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
 
-        int viewType = getItemViewType(position);
+//        int viewType = getItemViewType(position);
+//
+//        if (viewType == TYPE_ADS) {
+//            AdsViewHolder adsViewHolder = (AdsViewHolder) holder;
+//            NativeTemplateStyle nativeTemplateStyle = new NativeTemplateStyle.Builder()
+//                    .withMainBackgroundColor(new ColorDrawable(Color.parseColor("#171717")))
+//                    .withTertiaryTextTypefaceColor(Color.GRAY)
+//                    .withSecondaryTextTypefaceColor(Color.GRAY)
+//                    .withPrimaryTextTypefaceColor(Color.WHITE)
+//                    .build();
+//
+//            adsViewHolder.binding.myTemplate.setStyles(nativeTemplateStyle);
+//            adsViewHolder.setUnifiedNativeAds((UnifiedNativeAd) getItem(position));
+//            return;
+//        }
 
-        if (viewType == TYPE_ADS) {
-            AdsViewHolder adsViewHolder = (AdsViewHolder) holder;
-            NativeTemplateStyle nativeTemplateStyle = new NativeTemplateStyle.Builder()
-                    .withMainBackgroundColor(new ColorDrawable(Color.parseColor("#171717")))
-                    .withTertiaryTextTypefaceColor(Color.GRAY)
-                    .withSecondaryTextTypefaceColor(Color.GRAY)
-                    .withPrimaryTextTypefaceColor(Color.WHITE)
-                    .build();
+        final ShowAds showAds = new ViewModelProvider((ViewModelStoreOwner) context).get(ShowAds.class);
 
-            adsViewHolder.binding.myTemplate.setStyles(nativeTemplateStyle);
-            adsViewHolder.setUnifiedNativeAds((UnifiedNativeAd) getItem(position));
-            return;
-        }
-
-        NoteViewHolder noteViewHolder = (NoteViewHolder) holder;
         final Note note = (Note) getItem(position);
+
         if (note != null) {
-            noteViewHolder.binding.setNote(note);
+            holder.binding.setNote(note);
         }
-        noteViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, NoteDetailActivity.class);
-                intent.putExtra("subject", note.getSubject());
-                intent.putExtra("body", note.getBody());
-                intent.putExtra("date", note.getDate());
-                intent.putExtra("priority", note.getPriority());
-                intent.putExtra("id", note.getId());
-                context.startActivity(intent);
+
+                if (clickCount == 5) {
+                    // show ads
+                    showAds.booleanMutableLiveData.setValue(true);
+                    clickCount = 0;
+                } else {
+
+                    clickCount += 1;
+
+                    Intent intent = new Intent(context, NoteDetailActivity.class);
+                    intent.putExtra("subject", note.getSubject());
+                    intent.putExtra("body", note.getBody());
+                    intent.putExtra("date", note.getDate());
+                    intent.putExtra("priority", note.getPriority());
+                    intent.putExtra("id", note.getId());
+                    context.startActivity(intent);
+                }
             }
         });
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        return getItem(position) instanceof UnifiedNativeAd ? TYPE_ADS : TYPE_NORMAL;
-    }
+//    @Override
+//    public int getItemViewType(int position) {
+//        return getItem(position) instanceof UnifiedNativeAd ? TYPE_ADS : TYPE_NORMAL;
+//    }
 
     //    @Override
 //    public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int position) {

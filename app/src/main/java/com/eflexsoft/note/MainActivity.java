@@ -25,13 +25,16 @@ import com.eflexsoft.note.adapter.NoteAdapter;
 import com.eflexsoft.note.databinding.ActivityMainBinding;
 import com.eflexsoft.note.model.Note;
 import com.eflexsoft.note.viewmodel.NoteViewModel;
+import com.eflexsoft.note.viewmodel.ShowAds;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdLoader;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.formats.NativeAdOptions;
 import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -42,10 +45,16 @@ public class MainActivity extends AppCompatActivity {
 
     NoteViewModel viewModel;
     NoteAdapter noteAdapter;
+    ShowAds showAds;
 
-    List<Object> objectList = new ArrayList<>();
-    AdLoader adLoader;
-    boolean isFistTime = true;
+    //    List<Object> objectList = new ArrayList<>();
+//    AdLoader adLoader;
+//    boolean isFistTime = true;
+//
+    AdRequest adRequest;
+
+    private InterstitialAd mInterstitialAd;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +63,13 @@ public class MainActivity extends AppCompatActivity {
 
         final ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
+        adRequest = new AdRequest.Builder()
+                .tagForChildDirectedTreatment(true)
+                .build();
+
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-9552597639357298/8586611422");
+        mInterstitialAd.loadAd(adRequest);
         binding.recycleView.setHasFixedSize(true);
 
         StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, RecyclerView.VERTICAL);
@@ -64,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
         binding.recycleView.setAdapter(noteAdapter);
 //        c = findViewById(R.id.c);
         viewModel = new ViewModelProvider(this).get(NoteViewModel.class);
+        showAds = new ViewModelProvider(this).get(ShowAds.class);
 
         setSupportActionBar(binding.toolbar);
 //        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
@@ -78,53 +95,69 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        }).attachToRecyclerView(binding.recycleView);
 
-        adLoader = new AdLoader.Builder(this, "ca-app-pub-9552597639357298/7138206538")
-                .forUnifiedNativeAd(new UnifiedNativeAd.OnUnifiedNativeAdLoadedListener() {
-                    @Override
-                    public void onUnifiedNativeAdLoaded(UnifiedNativeAd unifiedNativeAd) {
-
-//                        if (isDestroyed()) {
-//                            unifiedNativeAd.destroy();
-//                        } else {
-                        objectList.add(unifiedNativeAd);
-
-                        if (!adLoader.isLoading()) {
-                            noteAdapter.submitList(objectList);
-                            noteAdapter.notifyItemInserted(objectList.size() - 1);
-                        }
+//        adLoader = new AdLoader.Builder(this, "ca-app-pub-9552597639357298/7138206538")
+//                .forUnifiedNativeAd(new UnifiedNativeAd.OnUnifiedNativeAdLoadedListener() {
+//                    @Override
+//                    public void onUnifiedNativeAdLoaded(UnifiedNativeAd unifiedNativeAd) {
+//
+////                        if (isDestroyed()) {
+////                            unifiedNativeAd.destroy();
+////                        } else {
+//                        objectList.add(unifiedNativeAd);
+//
+//                        if (!adLoader.isLoading()) {
+//                            noteAdapter.submitList(objectList);
+//                            noteAdapter.notifyItemInserted(objectList.size() - 1);
 //                        }
-                    }
-                }).withAdListener(new AdListener() {
-                    @Override
-                    public void onAdFailedToLoad(LoadAdError loadAdError) {
-                        super.onAdFailedToLoad(loadAdError);
-                        noteAdapter.submitList(objectList);
-                    }
-                }).withNativeAdOptions(new NativeAdOptions.Builder().build()).build();
+////                        }
+//                    }
+//                }).withAdListener(new AdListener() {
+//                    @Override
+//                    public void onAdFailedToLoad(LoadAdError loadAdError) {
+//                        super.onAdFailedToLoad(loadAdError);
+//                        noteAdapter.submitList(objectList);
+//                    }
+//                }).withNativeAdOptions(new NativeAdOptions.Builder().build()).build();
 
-        adLoader.loadAds(new AdRequest.Builder().build(), 4);
+
+//        adLoader.loadAd(adRequest);
+
+//        adLoader.loadAds(new AdRequest.Builder().build(), 1);
 
         viewModel.listLiveData.observe(this, new Observer<List<Note>>() {
             @Override
             public void onChanged(List<Note> notes) {
-
-                if (isFistTime) {
-                    objectList.addAll(notes);
-                    noteAdapter.submitList(objectList);
-                    isFistTime = false;
-                } else {
-
-                    objectList.clear();
-                    objectList.addAll(notes);
-                    adLoader.loadAds(new AdRequest.Builder().build(), 4);
-
-                    noteAdapter.submitList(objectList);
-                }
+//                if (isFistTime) {
+//                    objectList.addAll(notes);
+//                    noteAdapter.submitList(objectList);
+//                    isFistTime = false;
+//                } else {
+//
+//                    objectList.clear();
+//                    objectList.addAll(notes);
+//                    adLoader.loadAd(adRequest);
+//
+//                    noteAdapter.submitList(objectList);
+//                }
+                noteAdapter.submitList(notes);
 
                 if (notes.isEmpty()) {
                     binding.c.setVisibility(View.VISIBLE);
                 } else {
                     binding.c.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        showAds.getBooleanMutableLiveData().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if (aBoolean) {
+
+                    if (mInterstitialAd.isLoaded()) {
+                        mInterstitialAd.show();
+                    }
+
                 }
             }
         });
@@ -143,24 +176,43 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.delete_All:
 
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this)
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this, R.style.Dialog)
                         .setTitle("Confirm Delete")
-                        .setMessage("are you sure want to delete all items from your Notes? for this cannot be undone")
-                        .setPositiveButton("Nope", new DialogInterface.OnClickListener() {
+                        .setMessage("Are you sure want to delete all items from your Notes? for this cannot be undone")
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                viewModel.deleteAll();
+                            }
+                        }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
-                            }
-                        }).setNegativeButton("Yap", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                viewModel.deleteAll();
                             }
                         });
 
                 AlertDialog dialog = alertDialog.create();
 
                 dialog.show();
+
+//                new MaterialAlertDialogBuilder(this)
+//
+//
+//                new MaterialAlertDialogBuilder(this)
+//                        .setTitle(resources.getString(R.string.title))
+//                        .setMessage(resources.getString(R.string.supporting_text))
+//                        .setNeutralButton(resources.getString(R.string.cancel)) { dialog, which ->
+//                // Respond to neutral button press
+//            }
+//        .setNegativeButton(resources.getString(R.string.decline)) { dialog, which ->
+//                // Respond to negative button press
+//            }
+//        .setPositiveButton(resources.getString(R.string.accept)) { dialog, which ->
+//                // Respond to positive button press
+//            }
+//        .show()
+//
                 break;
             default:
                 return super.onOptionsItemSelected(item);

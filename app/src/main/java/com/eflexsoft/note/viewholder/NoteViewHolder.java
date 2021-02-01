@@ -15,5 +15,6 @@ public class NoteViewHolder extends RecyclerView.ViewHolder {
         super(binding.getRoot());
 
         this.binding = binding;
+
     }
 }

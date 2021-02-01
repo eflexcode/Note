@@ -37,15 +37,16 @@
                     android:id="@+id/edit_subject"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:hint="Subject..."
+                    android:hint="Write note title (Heading)"
                     android:paddingStart="15dp"
                     android:paddingTop="5dp"
+                    android:background="@android:color/transparent"
+                    android:layout_marginTop="10dp"
                     android:paddingEnd="15dp"
                     android:text=""
-                    android:textColorHighlight="#fff"
                     android:textColor="#FFFFFF"
-                    android:textColorHint="#fff"
+                    android:textColorHighlight="#fff"
+                    android:textColorHint="#BFBBBB"
                     android:textSize="20dp"
                     android:textStyle="bold" />
 
@@ -54,16 +55,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/edit_subject"
-                    android:autofillHints="no"
-                    android:background="@android:color/transparent"
-                    android:hint="Note.."
+                    android:hint="Note details.."
                     android:paddingStart="15dp"
                     android:paddingTop="20dp"
+                    android:background="@android:color/transparent"
                     android:paddingEnd="15dp"
                     android:text=""
                     android:textColor="#fff"
-                    android:textColorHint="#DAD8D8"
-                    android:textSize="18dp" />
+                    android:textColorHint="#BFBBBB"
+                    android:textSize="17dp" />
 
                 <TextView
                     android:id="@+id/p"
@@ -71,7 +71,7 @@
                     android:layout_height="match_parent"
                     android:layout_below="@id/edit_body"
                     android:layout_marginTop="30dp"
-                    android:paddingStart="15dp"
+                    android:paddingStart="25dp"
                     android:paddingTop="20dp"
                     android:paddingEnd="15dp"
                     android:text="pick note priority below"
@@ -80,7 +80,6 @@
 
                 <NumberPicker
                     android:id="@+id/priority_pick"
-                    android:theme="@style/AppTheme.Picker"
                     android:layout_width="match_parent"
                     android:layout_height="150dp"
                     android:layout_below="@id/p"
@@ -88,7 +87,8 @@
                     android:paddingStart="15dp"
                     android:paddingTop="5dp"
                     android:paddingEnd="15dp"
-                    android:solidColor="@color/colorPrimary" />
+                    android:solidColor="@color/colorPrimary"
+                    android:theme="@style/AppTheme.Picker" />
 
             </RelativeLayout>
         </androidx.core.widget.NestedScrollView>
@@ -102,9 +102,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="40dp"
-            android:backgroundTint="@color/colorPrimary"
             android:onClick="saveUpdate"
             android:src="@drawable/ic_done_all"
+            android:theme="@style/AppTheme"
             app:maxImageSize="30dp" />
 
 

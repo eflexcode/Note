@@ -79,20 +79,21 @@ public class NoteDetailActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.delete:
 
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this)
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this, R.style.Dialog)
                         .setTitle("Confirm Delete")
-                        .setMessage("are you sure want to delete this item from your Notes? for this cannot be undone")
-                        .setPositiveButton("Nope", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).setNegativeButton("Yap", new DialogInterface.OnClickListener() {
+                        .setMessage("Are you sure want to delete this item from your Notes? for this cannot be undone")
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 note.setId(id);
                                 noteViewModel.delete(note);
                                 finish();
+
+                            }
+                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
                             }
                         });
 
@@ -130,7 +131,6 @@ public class NoteDetailActivity extends AppCompatActivity {
 
             note = new Note(subject, body, date, priority);
             note.setId(id);
-
 
 
             binding.setNote(note);

@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.eflexsoft.note.databinding.ActivityAddEditNoteBinding;
 import com.eflexsoft.note.model.Note;
 import com.eflexsoft.note.viewmodel.NoteViewModel;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -52,11 +53,7 @@ public class AddEditNoteActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_edit_note);
 
 //        FrameLayout container = findViewById(R.id.fragment_main);
-//        subject = findViewById(R.id.edit_subject);
-//        body = findViewById(R.id.edit_body);
-//        textTitle = findViewById(R.id.textTitle);
-//        priority = findViewById(R.id.priority_pick);
-//        toolbar = findViewById(R.id.toolbar);
+//
         binding.priorityPick.setMaxValue(100);
         binding.priorityPick.setMinValue(0);
 //        priority.set(R.color.colorPrimary);
@@ -77,7 +74,7 @@ public class AddEditNoteActivity extends AppCompatActivity {
         }
 
         if (updateSubject == null) {
-            setTitle("Add Note");
+            setTitle("New Note");
         } else {
             setTitle("Update Note");
         }
@@ -109,8 +106,23 @@ public class AddEditNoteActivity extends AppCompatActivity {
 
         NoteViewModel viewModel = new ViewModelProvider(this).get(NoteViewModel.class);
 
-        if (getBody.isEmpty() || getSubject.isEmpty()) {
-            Toast.makeText(this, "A filed is empty", Toast.LENGTH_SHORT).show();
+        if (getSubject.trim().isEmpty()) {
+            Snackbar.make(view, "Hey there you haven't written your notes 'Title' ", Snackbar.LENGTH_INDEFINITE).setAction("got it", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            }).show();
+            return;
+        }
+
+        if (getBody.trim().isEmpty()) {
+            Snackbar.make(view, "Hey there you haven't written your notes 'Details' ", Snackbar.LENGTH_INDEFINITE).setAction("got it", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            }).show();
             return;
         }
 
@@ -125,9 +137,9 @@ public class AddEditNoteActivity extends AppCompatActivity {
             intent.putExtra("subject", getSubject);
             intent.putExtra("body", getBody);
             intent.putExtra("date", getDate);
-            intent.putExtra("priority",getPriority);
+            intent.putExtra("priority", getPriority);
             intent.putExtra("id", id);
-            setResult(RESULT_OK,intent);
+            setResult(RESULT_OK, intent);
             finish();
         }
 
