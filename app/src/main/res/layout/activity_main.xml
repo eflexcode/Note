@@ -123,6 +123,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
                 android:gravity="center"
+                android:textStyle="bold|italic"
                 android:text="No note found!"
                 android:textColor="#DAD8D8"
                 android:textSize="20sp" />

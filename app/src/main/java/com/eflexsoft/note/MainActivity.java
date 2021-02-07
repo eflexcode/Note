@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
                     if (mInterstitialAd.isLoaded()) {
                         mInterstitialAd.show();
                     }
-
+                    mInterstitialAd.loadAd(adRequest);
                 }
             }
         });

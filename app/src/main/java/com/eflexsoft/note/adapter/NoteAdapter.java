@@ -116,7 +116,7 @@ public class NoteAdapter extends ListAdapter<Note, NoteViewHolder> {
             @Override
             public void onClick(View v) {
 
-                if (clickCount == 5) {
+                if (clickCount == 3) {
                     // show ads
                     showAds.booleanMutableLiveData.setValue(true);
                     clickCount = 0;
