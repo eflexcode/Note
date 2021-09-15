@@ -5,6 +5,7 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.eflexsoft.note.model.Note;
 import com.eflexsoft.note.repository.Repository;
@@ -14,7 +15,9 @@ import java.util.List;
 public class NoteViewModel extends AndroidViewModel {
 
     Repository repository;
-   public LiveData<List<Note>> listLiveData;
+    public LiveData<List<Note>> listLiveData;
+    public MutableLiveData<Integer> integerMutableLiveData = new MutableLiveData<>();
+    public MutableLiveData<Boolean> clearSelected = new MutableLiveData<>();
 
     public NoteViewModel(@NonNull Application application) {
         super(application);
@@ -23,7 +26,7 @@ public class NoteViewModel extends AndroidViewModel {
     }
 
     public void insert(Note note) {
-      repository.insert(note);
+        repository.insert(note);
     }
 
     public void update(Note note) {
@@ -31,15 +34,22 @@ public class NoteViewModel extends AndroidViewModel {
     }
 
     public void delete(Note note) {
-       repository.delete(note);
+        repository.delete(note);
     }
 
     public void deleteAll() {
-       repository.deleteAll();
+        repository.deleteAll();
     }
 
     public LiveData<List<Note>> getListLiveData() {
         return listLiveData;
     }
 
+    public LiveData<Integer> getIntegerMutableLiveData() {
+        return integerMutableLiveData;
+    }
+
+    public MutableLiveData<Boolean> getClearSelected() {
+        return clearSelected;
+    }
 }

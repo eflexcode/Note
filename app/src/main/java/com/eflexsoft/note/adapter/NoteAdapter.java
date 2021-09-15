@@ -5,13 +5,19 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
+import androidx.recyclerview.selection.ItemDetailsLookup;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,14 +25,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.eflexsoft.nativeads.NativeTemplateStyle;
 import com.eflexsoft.note.NoteDetailActivity;
+import com.eflexsoft.note.Utils;
 import com.eflexsoft.note.databinding.AdTemplateBinding;
 import com.eflexsoft.note.model.Note;
 import com.eflexsoft.note.R;
 import com.eflexsoft.note.databinding.NoteItem2Binding;
 import com.eflexsoft.note.viewholder.AdsViewHolder;
 import com.eflexsoft.note.viewholder.NoteViewHolder;
+import com.eflexsoft.note.viewmodel.NoteViewModel;
 import com.eflexsoft.note.viewmodel.ShowAds;
 import com.google.android.gms.ads.formats.UnifiedNativeAd;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NoteAdapter extends ListAdapter<Note, NoteViewHolder> {
 
@@ -35,6 +46,10 @@ public class NoteAdapter extends ListAdapter<Note, NoteViewHolder> {
     public static final int TYPE_NORMAL = 1;
 
     int clickCount = 0;
+    public int selectedcount = 0;
+
+    List<Note> selectedNote = new ArrayList<>();
+    NoteViewModel noteViewModel;
 
     public NoteAdapter(Context context) {
         super(itemCallback);
@@ -53,23 +68,6 @@ public class NoteAdapter extends ListAdapter<Note, NoteViewHolder> {
         }
     };
 
-//    static DiffUtil.ItemCallback<Note> noteItemCallback = new DiffUtil.ItemCallback<Note>() {
-//        @Override
-//        public boolean areItemsTheSame(@NonNull Note oldItem, @NonNull Note newItem) {
-//            return oldItem.getId() == newItem.getId()
-//                    && oldItem.getSubject().equals(newItem.getSubject())
-//                    && oldItem.getBody().equals(newItem.getBody())
-//                    && oldItem.getDate().equals(newItem.getDate())
-//                    && oldItem.getPriority() == newItem.getPriority();
-//        }
-//
-//        @Override
-//        public boolean areContentsTheSame(@NonNull Note oldItem, @NonNull Note newItem) {
-//
-//            return oldItem.equals(newItem);
-//        }
-//    };
-
     @NonNull
     @Override
     public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
@@ -86,25 +84,12 @@ public class NoteAdapter extends ListAdapter<Note, NoteViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
-
-//        int viewType = getItemViewType(position);
-//
-//        if (viewType == TYPE_ADS) {
-//            AdsViewHolder adsViewHolder = (AdsViewHolder) holder;
-//            NativeTemplateStyle nativeTemplateStyle = new NativeTemplateStyle.Builder()
-//                    .withMainBackgroundColor(new ColorDrawable(Color.parseColor("#171717")))
-//                    .withTertiaryTextTypefaceColor(Color.GRAY)
-//                    .withSecondaryTextTypefaceColor(Color.GRAY)
-//                    .withPrimaryTextTypefaceColor(Color.WHITE)
-//                    .build();
-//
-//            adsViewHolder.binding.myTemplate.setStyles(nativeTemplateStyle);
-//            adsViewHolder.setUnifiedNativeAds((UnifiedNativeAd) getItem(position));
-//            return;
-//        }
+    public void onBindViewHolder(@NonNull final NoteViewHolder holder, final int position) {
 
         final ShowAds showAds = new ViewModelProvider((ViewModelStoreOwner) context).get(ShowAds.class);
+        noteViewModel = new ViewModelProvider((ViewModelStoreOwner) context).get(NoteViewModel.class);
+
+        holder.binding.re.setBackground(Utils.getRandomColor());
 
         final Note note = (Note) getItem(position);
 
@@ -112,93 +97,93 @@ public class NoteAdapter extends ListAdapter<Note, NoteViewHolder> {
             holder.binding.setNote(note);
         }
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.binding.ripple.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+//                Toast.makeText(context, note.getSubject(), Toast.LENGTH_SHORT).show();
+                if (holder.binding.selectedItemIcon.getVisibility() == View.VISIBLE) {
+                    selectedcount -= 1;
+                    noteViewModel.integerMutableLiveData.setValue(selectedcount);
+                    holder.binding.selectedItemIcon.setVisibility(View.GONE);
+                    selectedNote.remove(note);
+
+                } else {
+                    selectedcount += 1;
+                    holder.binding.selectedItemIcon.setVisibility(View.VISIBLE);
+                    noteViewModel.integerMutableLiveData.setValue(selectedcount);
+                    selectedNote.add(note);
+
+                }
+//               notifyItemChanged(position);
+                return true;
+            }
+        });
+
+        holder.binding.ripple.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (clickCount == 3) {
-                    // show ads
-                    showAds.booleanMutableLiveData.setValue(true);
-                    clickCount = 0;
+                if (selectedcount > 0) {
+                    if (holder.binding.selectedItemIcon.getVisibility() == View.VISIBLE) {
+                        selectedcount -= 1;
+                        noteViewModel.integerMutableLiveData.setValue(selectedcount);
+                        holder.binding.selectedItemIcon.setVisibility(View.GONE);
+                        selectedNote.remove(note);
+                    } else {
+                        selectedcount += 1;
+                        holder.binding.selectedItemIcon.setVisibility(View.VISIBLE);
+                        noteViewModel.integerMutableLiveData.setValue(selectedcount);
+                        selectedNote.add(note);
+                    }
                 } else {
 
-                    clickCount += 1;
+                    if (clickCount == 3) {
+                        // show ads
+                        showAds.booleanMutableLiveData.setValue(true);
+                        clickCount = 0;
+                    } else {
 
-                    Intent intent = new Intent(context, NoteDetailActivity.class);
-                    intent.putExtra("subject", note.getSubject());
-                    intent.putExtra("body", note.getBody());
-                    intent.putExtra("date", note.getDate());
-                    intent.putExtra("priority", note.getPriority());
-                    intent.putExtra("id", note.getId());
-                    context.startActivity(intent);
+                        clickCount += 1;
+
+                        Intent intent = new Intent(context, NoteDetailActivity.class);
+                        intent.putExtra("subject", note.getSubject());
+                        intent.putExtra("body", note.getBody());
+                        intent.putExtra("date", note.getDate());
+                        intent.putExtra("priority", note.getPriority());
+                        intent.putExtra("id", note.getId());
+                        context.startActivity(intent);
+                    }
+                }
+            }
+        });
+
+        //when user cancel selection
+        noteViewModel.getClearSelected().observe((LifecycleOwner) context, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if (aBoolean) {
+                    holder.binding.selectedItemIcon.setVisibility(View.GONE);
+                    selectedNote.clear();
+                } else {
+                    holder.binding.selectedItemIcon.setVisibility(View.VISIBLE);
                 }
             }
         });
     }
 
-//    @Override
-//    public int getItemViewType(int position) {
-//        return getItem(position) instanceof UnifiedNativeAd ? TYPE_ADS : TYPE_NORMAL;
-//    }
-
-    //    @Override
-//    public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int position) {
-//
-//        final Note note = getItem(position);
-//
-//        if (note != null) {
-//            viewHolder.binding.setNote(note);
-//        }
-//
-////        viewHolder.date.setText(note.getDate());
-////        viewHolder.body.setText(note.getBody());
-////        viewHolder.subject.setText(note.getSubject());
-////        viewHolder.priority.setText(String.valueOf(note.getPriority()));
-//
-////        viewHolder.binding.re.setBackground(Utils.getRandomColor());
-////        viewHolder.binding.card.setBackground(Utils.getRandomColor());
-////        viewHolder.binding.card.setRadius(5f);
-//
-//        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(context, NoteDetailActivity.class);
-//                intent.putExtra("subject", note.getSubject());
-//                intent.putExtra("body", note.getBody());
-//                intent.putExtra("date", note.getDate());
-//                intent.putExtra("priority", note.getPriority());
-//                intent.putExtra("id", note.getId());
-//                context.startActivity(intent);
-//            }
-//        });
-
-//        if (position == noteList.size() - 1) {
-
-//            CardView.LayoutParams layoutParams = new CardView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 350);
-//            layoutParams.setMargins(0, 30, 0, 30);
-//
-//            viewHolder.binding.card.setLayoutParams(layoutParams);
-//            viewHolder.binding.card.setPadding(0,0,0,80);
-
-//        }
-
-//    }
-
-//    @Override
-//    public int getItemCount() {
-//        return noteList.size();
-//    }
-
     public Note note(int position) {
         return (Note) getItem(position);
     }
 
+    public void deleteSelectedNote() {
+        for (Note note : selectedNote) {
+            noteViewModel.delete(note);
+        }
+    }
+
     class ViewHolder extends RecyclerView.ViewHolder {
 
-//        TextView subject;
-//        TextView body;
-//        TextView date;
-////        TextView priority;
 
         NoteItem2Binding binding;
 
@@ -207,11 +192,36 @@ public class NoteAdapter extends ListAdapter<Note, NoteViewHolder> {
 
             this.binding = binding;
 
-//            subject = itemView.findViewById(R.id.subject);
-//            body = itemView.findViewById(R.id.body);
-//            date = itemView.findViewById(R.id.date);
-//            priority = itemView.findViewById(R.id.priority);
 
+        }
+    }
+
+    static class NoteDetailsLookUp extends ItemDetailsLookup<Integer> {
+
+        RecyclerView recyclerView;
+
+        public NoteDetailsLookUp(RecyclerView recyclerView) {
+            this.recyclerView = recyclerView;
+        }
+
+        @Nullable
+        @Override
+        public ItemDetails<Integer> getItemDetails(@NonNull MotionEvent e) {
+
+            View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
+
+            if (view != null) {
+                RecyclerView.ViewHolder viewHolder = recyclerView.getChildViewHolder(view);
+
+                if (viewHolder instanceof ViewHolder) {
+
+//                    return ((ViewHolder) viewHolder).
+
+                }
+
+            }
+
+            return null;
         }
     }
 }

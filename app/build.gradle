@@ -8,8 +8,8 @@ android {
         applicationId "com.eflexsoft.note"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 8
-        versionName "2.2"
+        versionCode 11
+        versionName "3.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -24,19 +24,24 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
 
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview-selection:1.1.0'
     def lifecycle_version = "2.2.0"
     def room_version = "2.2.1"
     def cardview_version = "1.0.0"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    
-    implementation 'com.google.android.gms:play-services-ads:19.6.0'
+
+    implementation 'com.google.android.gms:play-services-ads:20.1.0'
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
@@ -46,7 +51,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     implementation "androidx.cardview:cardview:$cardview_version"
-    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'com.google.android.material:material:1.3.0'
     implementation 'com.rengwuxian.materialedittext:library:2.1.4'
 
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
@@ -65,5 +70,10 @@ dependencies {
     implementation "com.jakewharton.rxbinding3:rxbinding:$rxbinding_version"
     implementation project(':nativeads')
 
-    implementation "com.google.android.material:material:1.3.0-rc01"
+//    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+//    implementation "com.google.android.material:material:1.3.0-rc01"
+
+//    implementation 'androidx.recyclerview:recyclerview:-selection:1.1.0'
+
+    implementation 'com.balysv:material-ripple:1.0.2'
 }

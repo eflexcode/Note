@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#171717</color>
-    <color name="colorPrimaryDark">#000</color>
+    <color name="colorPrimaryDark">#171717</color>
     <color name="colorAccent">#171717</color>
+    <color name="selectedStatusBar">#511717</color>
     <color name="colorWhite">#FFF</color>
     <color name="txtColor">#BFBBBB</color>
+    <color name="orange">#ee44</color>
+    <color name="darkgray">#A9A9A9</color>
+    <color name="testcolor">#1A703E</color>
 </resources>

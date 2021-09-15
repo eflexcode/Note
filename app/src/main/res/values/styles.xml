@@ -6,8 +6,9 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-<!--        <item name="alertDialogTheme">@style/Theme.AppCompat.DayNight.Dialog</item>-->
-<!--        <item name="android:alertDialogTheme">@style/Theme.AppCompat.DayNight.Dialog.Alert</item>-->
+        <item name="actionModeBackground">@color/colorPrimary</item>
+        <item name="windowActionBarOverlay">true</item>
+        <item name="windowActionModeOverlay">true</item>
     </style>
 
     <style name="AppTheme.Picker" parent="Theme.AppCompat.Light.NoActionBar">
@@ -22,17 +23,11 @@
     </style>
 
     <style name="Dialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">
-<!--        <item name="colorPrimary">@color/txtColor</item>-->
-<!--        <item name="colorPrimaryDark">@color/txtColor</item>-->
-<!--        <item name="colorAccent">@color/txtColor</item>-->
         <item name="android:textColorPrimary">@color/txtColor</item>
         <item name="android:colorAccent">@color/txtColor</item>
         <item name="android:textColor">@color/colorWhite</item>
         <item name="subtitleTextColor">@color/txtColor</item>
-<!--        <item name=""-->
         <item name="android:background">@color/colorAccent</item>
-<!--        <item name="alertDialogTheme">@style/Theme.AppCompat.DayNight.Dialog.Alert</item>-->
-<!--        <item name="android:alertDialogTheme">@style/Theme.AppCompat.DayNight.Dialog.Alert</item>-->
     </style>
 
 </resources>

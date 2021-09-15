@@ -35,7 +35,6 @@ public class NoteDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_note_detail);
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_note_detail);
 
@@ -58,7 +57,6 @@ public class NoteDetailActivity extends AppCompatActivity {
         updatePriority = intent.getIntExtra("priority", 0);
         date = intent.getStringExtra("date");
         id = intent.getIntExtra("id", -1);
-//        Toast.makeText(this, String.valueOf(id), Toast.LENGTH_SHORT).show();
         note = new Note(updateSubject, updateBody, date, updatePriority);
 //        note.setId(id);
         binding.setNote(note);
@@ -127,14 +125,11 @@ public class NoteDetailActivity extends AppCompatActivity {
             String date = data.getStringExtra("date");
             int id = data.getIntExtra("id", -1);
 
-//            Toast.makeText(this, subject, Toast.LENGTH_SHORT).show();
-
             note = new Note(subject, body, date, priority);
             note.setId(id);
 
 
             binding.setNote(note);
-//            binding.body.setText();
         }
     }
 }

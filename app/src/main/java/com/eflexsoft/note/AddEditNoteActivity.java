@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
@@ -20,8 +21,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.eflexsoft.note.databinding.ActivityAddEditNoteBinding;
+import com.eflexsoft.note.fragment.PickPriorityFragment;
 import com.eflexsoft.note.model.Note;
 import com.eflexsoft.note.viewmodel.NoteViewModel;
+import com.eflexsoft.note.viewmodel.PriorityPickerViewModel;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
@@ -31,9 +34,7 @@ import java.text.DateFormat;
 import java.util.Calendar;
 
 public class AddEditNoteActivity extends AppCompatActivity {
-//    TextView subject;
-//    TextView body;
-//    NumberPicker priority;
+
 
     Intent intent;
     String updateSubject;
@@ -41,22 +42,16 @@ public class AddEditNoteActivity extends AppCompatActivity {
     int updatePriority;
     String date;
     int id;
-    //    Toolbar toolbar;
-//    TextView textTitle;
     ActivityAddEditNoteBinding binding;
+    PriorityPickerViewModel viewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_add_edit_note);
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_edit_note);
 
-//        FrameLayout container = findViewById(R.id.fragment_main);
-//
-        binding.priorityPick.setMaxValue(100);
-        binding.priorityPick.setMinValue(0);
-//        priority.set(R.color.colorPrimary);
         setSupportActionBar(binding.toolbar);
         intent = getIntent();
         updateSubject = intent.getStringExtra("subject");
@@ -65,18 +60,27 @@ public class AddEditNoteActivity extends AppCompatActivity {
 //        date = intent.getStringExtra("date");
         id = intent.getIntExtra("id", -1);
 
-//        Toast.makeText(this, String.valueOf(id), Toast.LENGTH_SHORT).show();
+        viewModel = new ViewModelProvider(this).get(PriorityPickerViewModel.class);
+
+        viewModel.getPriorityNumber().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                updatePriority = integer;
+            }
+        });
 
         if (updateSubject != null) {
             binding.editSubject.setText(updateSubject);
             binding.editBody.setText(updateBody);
-            binding.priorityPick.setValue(updatePriority);
+            viewModel.priorityNumber.setValue(updatePriority);
         }
 
+//        Toast.makeText(this, " "+updatePriority, Toast.LENGTH_SHORT).show();
+
         if (updateSubject == null) {
-            setTitle("New Note");
+            binding.title.setText("New Note");
         } else {
-            setTitle("Update Note");
+            binding.title.setText("Update Note");
         }
         binding.toolbar.setNavigationIcon(R.drawable.ic_left_arrow);
         binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -102,7 +106,7 @@ public class AddEditNoteActivity extends AppCompatActivity {
 
         String getSubject = binding.editSubject.getText().toString();
         String getBody = binding.editBody.getText().toString();
-        int getPriority = binding.priorityPick.getValue();
+//        int getPriority = binding.priorityPick.getValue();
 
         NoteViewModel viewModel = new ViewModelProvider(this).get(NoteViewModel.class);
 
@@ -127,17 +131,17 @@ public class AddEditNoteActivity extends AppCompatActivity {
         }
 
         if (updateSubject == null) {
-            viewModel.insert(new Note(getSubject, getBody, getDate, getPriority));
+            viewModel.insert(new Note(getSubject, getBody, getDate, updatePriority));
             finish();
         } else {
-            Note note = new Note(getSubject, getBody, getDate, getPriority);
+            Note note = new Note(getSubject, getBody, getDate, updatePriority);
             note.setId(id);
             viewModel.update(note);
             Intent intent = new Intent();
             intent.putExtra("subject", getSubject);
             intent.putExtra("body", getBody);
             intent.putExtra("date", getDate);
-            intent.putExtra("priority", getPriority);
+            intent.putExtra("priority", updatePriority);
             intent.putExtra("id", id);
             setResult(RESULT_OK, intent);
             finish();
@@ -147,63 +151,68 @@ public class AddEditNoteActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.save_note, menu);
-        return true;
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.saveAsFile:
-
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                    }
-                } else {
-
-                    Toast.makeText(this, "saving", Toast.LENGTH_SHORT).show();
-                    try {
-                        String getSubject = binding.editSubject.getText().toString();
-                        String getBody = binding.editBody.getText().toString();
-                        int getPriority = binding.priorityPick.getValue();
-                        if (getBody.isEmpty() || getSubject.isEmpty()) {
-                            Toast.makeText(this, "a file is empty", Toast.LENGTH_SHORT).show();
-                        } else {
-
-                            File root = new File(Environment.getExternalStorageDirectory(), "Notes");
-                            if (!root.exists()) {
-                                root.mkdirs();
-                            }
-                            File file = new File(root, getSubject + ".txt");
-
-                            FileWriter fileWriter = new FileWriter(file, true);
-
-                            fileWriter.append(getBody + "/n priority " + getPriority);
-                            fileWriter.flush();
-                            fileWriter.close();
-                            Toast.makeText(this, "File saved successfully", Toast.LENGTH_SHORT).show();
-
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.d(TAG, e.getMessage());
-                    }
-                }
-                break;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        MenuInflater menuInflater = getMenuInflater();
+//        menuInflater.inflate(R.menu.save_note, menu);
+//        return true;
+//    }
+//
+//
+//    @Override
+//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//
+//        switch (item.getItemId()) {
+//            case R.id.saveAsFile:
+//
+//                if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+//                    }
+//                } else {
+//
+//                    Toast.makeText(this, "saving", Toast.LENGTH_SHORT).show();
+//                    try {
+//                        String getSubject = binding.editSubject.getText().toString();
+//                        String getBody = binding.editBody.getText().toString();
+//                        int getPriority = binding.priorityPick.getValue();
+//                        if (getBody.isEmpty() || getSubject.isEmpty()) {
+//                            Toast.makeText(this, "a file is empty", Toast.LENGTH_SHORT).show();
+//                        } else {
+//
+//                            File root = new File(Environment.getExternalStorageDirectory(), "Notes");
+//                            if (!root.exists()) {
+//                                root.mkdirs();
+//                            }
+//                            File file = new File(root, getSubject + ".txt");
+//
+//                            FileWriter fileWriter = new FileWriter(file, true);
+//
+//                            fileWriter.append(getBody + "/n priority " + getPriority);
+//                            fileWriter.flush();
+//                            fileWriter.close();
+//                            Toast.makeText(this, "File saved successfully", Toast.LENGTH_SHORT).show();
+//
+//                        }
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+//                        Log.d(TAG, e.getMessage());
+//                    }
+//                }
+//                break;
+//            default:
+//                return super.onOptionsItemSelected(item);
+//        }
+//        return true;
+//    }
 
     private static final String TAG = "AddEditNoteActivity";
+
+    public void openPriorityPicker(View view) {
+        PickPriorityFragment priorityFragment = new PickPriorityFragment();
+        priorityFragment.show(getSupportFragmentManager(), "y");
+    }
 
 //    public void finish(View view) {
 //        finish();

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"
+        tools:context=".fragment.PickPriorityFragment">
+
+        <TextView
+            android:id="@+id/p"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/averia_sans_libre"
+            android:paddingStart="25dp"
+            android:paddingTop="20dp"
+            android:paddingEnd="15dp"
+            android:text="Please pick note priority below"
+            android:textColor="#BFBBBB"
+            android:textSize="20dp" />
+
+        <NumberPicker
+            android:id="@+id/priority_pick"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_below="@id/p"
+            android:layout_margin="20dp"
+            android:paddingStart="15dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="15dp"
+            android:solidColor="@color/colorPrimary"
+            android:theme="@style/AppTheme.Picker" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/priority_pick"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="30dp"
+            android:id="@+id/apply"
+            android:layout_marginBottom="50dp"
+            android:background="@drawable/button_background"
+            android:fontFamily="@font/averia_sans_libre"
+            android:text="Apply priority changes"
+            android:textAllCaps="false"
+            android:textColor="@color/gnt_white"
+            android:textSize="20sp"
+            app:cornerRadius="10dp" />
+
+    </RelativeLayout>
+</layout>
