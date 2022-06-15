@@ -100,6 +100,6 @@
             android:layout_height="60dp"
             android:layout_gravity="bottom"
             ads:adSize="SMART_BANNER"
-            ads:adUnitId="ca-app-pub-9552597639357298/4396493434" />
+            ads:adUnitId="ca-app-pub-9552597639357298/7951572902" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

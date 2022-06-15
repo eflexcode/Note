@@ -22,7 +22,7 @@
         <item name="colorAccent">@color/colorWhite</item>
     </style>
 
-    <style name="Dialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+    <style name="Dialog" parent="Theme.MaterialComponents.Light.Dialog">
         <item name="android:textColorPrimary">@color/txtColor</item>
         <item name="android:colorAccent">@color/txtColor</item>
         <item name="android:textColor">@color/colorWhite</item>

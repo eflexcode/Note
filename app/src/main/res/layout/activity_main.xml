@@ -14,7 +14,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -92,9 +91,9 @@
 
         <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:layout_gravity="bottom"
             ads:adSize="SMART_BANNER"
-            ads:adUnitId="ca-app-pub-9552597639357298/4396493434" />
+            ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
